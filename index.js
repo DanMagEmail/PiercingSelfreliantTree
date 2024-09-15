@@ -12,8 +12,10 @@ let base64Image = '';
 
 // Handle POST request to receive and store text data
 app.post('/upload', (req, res) => {
+  console.log('Received POST request');
   if (req.body) {
-    base64Image = req.body; // Assuming the entire body is the Base64 string
+    base64Image = req.body; // Store the Base64 string
+    console.log('Stored image data:', base64Image.slice(0, 100) + '...'); // Log part of the data for debugging
     res.send('Text data (Base64 encoded image) uploaded and stored successfully');
   } else {
     res.status(400).send('No text data provided');
@@ -22,10 +24,11 @@ app.post('/upload', (req, res) => {
 
 // Handle GET request to retrieve the stored text data
 app.get('/image', (req, res) => {
+  console.log('Received GET request');
   if (base64Image) {
-    res.send(base64Image);
+    res.json({ image: base64Image }); // Return the data as JSON
   } else {
-    res.status(404).send('No image data available');
+    res.status(404).json({ message: 'No image data available' });
   }
 });
 
