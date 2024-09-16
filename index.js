@@ -7,22 +7,23 @@ const port = process.env.PORT || 3000;
 // Global variable to store Base64 encoded image
 let base64Image = ''; // Declare globally
 
-// Increase payload size limit for text data
-app.use(bodyParser.text({ limit: '50mb' })); // Adjust the limit as needed
+// Middleware to parse JSON body
+app.use(bodyParser.json({ limit: '50mb' })); // Parse JSON and adjust size limit if needed
 
-// Handle POST request to receive and store text data
+// Handle POST request to receive and store Base64 image from JSON body
 app.post('/upload', (req, res) => {
   console.log('Received POST request');
-  if (typeof req.body === 'string' && req.body.length > 0) {
-    base64Image = req.body; // Store the Base64 string globally
+  const { pic } = req.body; // Extract 'pic' key from the JSON body
+  if (typeof pic === 'string' && pic.length > 0) {
+    base64Image = pic; // Store the Base64 string globally
     console.log('Stored image data:', base64Image.slice(0, 100) + '...'); // Log part of the data for debugging
-    res.send('Text data (Base64 encoded image) uploaded and stored successfully');
+    res.send('Image data (Base64 encoded) uploaded and stored successfully');
   } else {
-    res.status(400).send('No valid text data provided');
+    res.status(400).send('Invalid or missing "pic" key in JSON');
   }
 });
 
-// Handle GET request to retrieve the stored text data
+// Handle GET request to retrieve the stored Base64 image
 app.get('/image', (req, res) => {
   console.log('Received GET request');
   if (base64Image.length > 0) {
