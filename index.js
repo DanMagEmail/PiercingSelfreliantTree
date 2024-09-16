@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const fs = require('fs'); // File system module for writing files
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -23,12 +25,25 @@ app.post('/upload', (req, res) => {
   }
 });
 
-// Handle GET request to retrieve the stored Base64 image
+// Handle GET request to decode the Base64 image and send the JPEG file
 app.get('/image', (req, res) => {
   console.log('Received GET request');
   if (base64Image.length > 0) {
-    res.setHeader('Content-Type', 'text/plain'); // Set response content type to plain text
-    res.send(base64Image); // Send only the Base64 string as plain text
+    // Decode Base64 to binary
+    const imageBuffer = Buffer.from(base64Image, 'base64');
+
+    // Save the image as "image1.jpg"
+    const imagePath = path.join(__dirname, 'image1.jpg');
+    fs.writeFile(imagePath, imageBuffer, (err) => {
+      if (err) {
+        console.error('Error writing image file:', err);
+        res.status(500).send('Error processing image');
+      } else {
+        // Send the image file as a response
+        res.setHeader('Content-Type', 'image/jpeg');
+        res.sendFile(imagePath);
+      }
+    });
   } else {
     res.status(404).send('No image data available');
   }
